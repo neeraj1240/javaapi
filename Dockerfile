@@ -1,17 +1,18 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
+# Build stage
+FROM maven:3.8.4-openjdk-17 as build
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Set the working directory in the container
+# Runtime stage
+FROM openjdk:17-jdk-slim
 WORKDIR /app
 
-# Copy the local code to the container
-COPY . /app
+# Copy the built jar file from the build stage
+COPY --from=build /app/target/*.jar app.jar
 
-# Install dependencies (if you're using Maven)
-RUN ./mvnw clean install
-
-# Expose the port your app runs on
+# Expose the port your application runs on
 EXPOSE 8080
 
-# Run the Spring Boot app
-CMD ["./mvnw", "spring-boot:run"]
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
