@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: dictionary-api
+    env: java
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
